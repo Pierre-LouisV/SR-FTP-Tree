@@ -14,7 +14,7 @@ import java.util.ArrayList;
  */
 public class FTPClient {
 	
-	private static final boolean TALK = true;
+	private static final boolean TALK = false;
 	private Socket skt;
 	private BufferedReader in;
 	private BufferedWriter out;
@@ -31,6 +31,13 @@ public class FTPClient {
 	 */
 	public FTPClient(String adress, int port) {
 		connectAnon(adress, port);
+	}
+	
+	/**
+	 * Constructor for logged connection
+	 */
+	public FTPClient(String adress, int port, String user, String passwd) {
+		connectLogin(adress, port, user, passwd);
 	}
 	
 	/**
@@ -52,6 +59,32 @@ public class FTPClient {
 			
 			//PASSS <SP> <mot de passe> <CRLF>
 			write("PASS guest");
+			read();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Connects anon to the ftp server with the adress
+	 */
+	public void connectLogin(String adress, int port, String user, String passwd) {
+		try {	
+			skt = new Socket(adress, port);
+
+			in = new BufferedReader(new InputStreamReader(skt.getInputStream()));
+			out = new BufferedWriter(new OutputStreamWriter(skt.getOutputStream()));
+
+			String reponse = in.readLine();
+			if(TALK) {System.out.println(reponse);}
+			
+			//ER <SP> <nom d'utilisateur> <CRLF>
+			write("USER "+user);
+			read();
+			
+			//PASSS <SP> <mot de passe> <CRLF>
+			write("PASS "+passwd);
 			read();
 			
 		} catch (Exception e) {
@@ -200,7 +233,7 @@ public class FTPClient {
 					} else {
 						System.out.println(tab+"└──"+fileName);
 					}
-					tree(directory+fileName,level-1,baseLevel);
+					tree(directory+"/"+fileName,level-1,baseLevel);
 				} else {
 					if(i!=lsReponse.size()-1) {
 						System.out.println(tab+"├──"+fileName);
