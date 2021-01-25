@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  * @author Pierre-Louis Virey
@@ -13,10 +14,17 @@ import java.net.Socket;
  */
 public class FTPClient {
 	
-	private static final boolean TALK = false;
+	private static final boolean TALK = true;
 	private Socket skt;
 	private BufferedReader in;
 	private BufferedWriter out;
+	
+	/**
+	 * Constructor for test
+	 */
+	public FTPClient() {
+
+	}
 	
 	/**
 	 * Constructor for anonymous connection
@@ -56,7 +64,7 @@ public class FTPClient {
 	 * @return the raw result of the command.
 	 * @throws IOException 
 	 */
-	public String ls() throws IOException {
+	public ArrayList<String> ls(String directory) throws IOException {
 		//Connection passive
 		write("PASV");
 		String reponse = read();
@@ -71,7 +79,7 @@ public class FTPClient {
 		if(TALK) {System.out.println(port);}
 		
 		//LIST [<SP> <chemin d'accès>] <CRLF> Ici on liste le répertoire courant.
-		write("LIST ");
+		write("LIST "+directory);
 		
 		Socket sktData = new Socket(ipAdress, port);
 		
@@ -80,18 +88,20 @@ public class FTPClient {
 		BufferedReader inData = new BufferedReader(new InputStreamReader(sktData.getInputStream()));
 		
 		String reponse2 = inData.readLine();
-		StringBuilder sb = new StringBuilder();
+		ArrayList<String> lsResult = new ArrayList<String>();
 		
 		while(reponse2!=null) {
-			sb.append(reponse2).append("\n");
+			lsResult.add(reponse2);
 			reponse2 = inData.readLine();
 		}
+		
+		read();
 		
 		//Ne change pas grand chose car normalement c'est fermé.
 		//inData.close();
 		//sktData.close();
 		
-		return sb.toString();
+		return lsResult;
 	}
 	
 	/**
@@ -102,7 +112,7 @@ public class FTPClient {
 		return null;
 	}
 	
-	public void tree() {
+	public void test_co() {
 		String reponse = "";
 		
 		try {
@@ -111,12 +121,13 @@ public class FTPClient {
 			write("PWD");
 			read();
 			
-			String lsReponse = ls();
-			
-			//System.out.println(lsReponse);
+			ArrayList<String> lsReponse = ls("/");
+			for (String file : lsReponse) {
+				System.out.println(file);
+			}
 			
 			//On lis le resultat de la commande ls
-			read();
+			//read();
 			
 			write("PWD");
 			read();
@@ -127,13 +138,81 @@ public class FTPClient {
 			write("PWD");
 			read();
 			
-			lsReponse = ls();
-			System.out.println(lsReponse);
+			lsReponse = ls("/cdimage/");
+			for (String file : lsReponse) {
+				System.out.println(file);
+			}
+			//read();
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		System.out.println("------");
+	}
+	
+	/**
+	 * Return true if the file is a directory.
+	 */
+	public boolean isDirectory(String file) {
+		return file.startsWith("d");
+	}
+	
+	public String getFileName(String lsLine) {
+		String[] splited = lsLine.split(" ");
+		return splited[splited.length-1];
+	}
+	
+	public void tree(String directory, int level) {
+		System.out.println(".");
+		tree(directory,level,level);
+	}
+	
+	/**
+	 * Return the good number of tab.
+	 */
+	public String getTab(int level, int baseLevel) {
+		StringBuilder sb = new StringBuilder();
+		int nbTab = baseLevel-level;
+		
+		for (int i=0; i<nbTab; i++) {
+			sb.append("\t");
+		}
+		
+		return sb.toString();
+	}
+	
+	protected void tree(String directory, int level, int baseLevel) {
+	
+		//Non execution de la fonction si le niveau n'est est de 0.
+		if(level == 0) {return;}
+		
+		try {
+			ArrayList<String> lsReponse = ls(directory);
+			for (int i=0; i<lsReponse.size(); i++) {
+				String file = lsReponse.get(i);
+				String fileName = getFileName(file);
+				
+				String tab = getTab(level, baseLevel);
+				
+				if(isDirectory(file)) {
+					if(i!=lsReponse.size()-1) {
+						System.out.println(tab+"├──"+fileName);
+					} else {
+						System.out.println(tab+"└──"+fileName);
+					}
+					tree(directory+fileName,level-1,baseLevel);
+				} else {
+					if(i!=lsReponse.size()-1) {
+						System.out.println(tab+"├──"+fileName);
+					} else {
+						System.out.println(tab+"└──"+fileName);
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 	
 	/**

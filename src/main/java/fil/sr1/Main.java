@@ -13,6 +13,7 @@ public class Main {
 		//System.out.println(getServerAdress("ftp.ubuntu.com").getHostAddress());
 		//connect("ftp.ubuntu.com");
 		FTPClient ftp = new FTPClient("ftp.ubuntu.com",21);
-		ftp.tree();
+		//ftp.test_co();
+		ftp.tree("/",1);
 	}
 }
