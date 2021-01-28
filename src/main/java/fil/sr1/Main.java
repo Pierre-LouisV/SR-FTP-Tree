@@ -92,9 +92,9 @@ public class Main {
 		ftp.tree(2);
 		*/
 		
-		//String[] fakeArg = {"vps-e0d81721.vps.ovh.net","-u","plv","-p","jaimelesgrosftp","-d","dir3","-L","1"};
-		//String[] fakeArg = {"ftp.ubuntu.com","-d","cdimage"};
+		String[] fakeArg = {"vps-e0d81721.vps.ovh.net","-u","plv","-p","jaimelesgrosftp","-d","dir2","-L","1"};
+		//String[] fakeArg = {"ftp.ubuntu.dzzd","-d","cdimage"};
 		
-		parseLaunchTree(args);
+		parseLaunchTree(fakeArg);
 	}
 }

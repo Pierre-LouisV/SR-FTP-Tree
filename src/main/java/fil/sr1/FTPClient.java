@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -32,48 +33,33 @@ public class FTPClient {
 	 * Constructor for anonymous connection
 	 */
 	public FTPClient(String adress, int port) {
-		connectAnon(adress, port);
+		try {
+			connectAnon(adress, port);
+		} catch (ConnexionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 
 	/**
 	 * Constructor for logged connection
 	 */
 	public FTPClient(String adress, int port, String user, String passwd) {
-		connectLogin(adress, port, user, passwd);
-	}
-
-	/**
-	 * Connects anon to the ftp server with the adress
-	 */
-	public void connectAnon(String adress, int port) {
 		try {
-			skt = new Socket(adress, port);
-
-			in = new BufferedReader(new InputStreamReader(skt.getInputStream()));
-			out = new BufferedWriter(new OutputStreamWriter(skt.getOutputStream()));
-
-			String reponse = in.readLine();
-			if (TALK) {
-				System.out.println(reponse);
-			}
-
-			// ER <SP> <nom d'utilisateur> <CRLF>
-			write("USER anonymous");
-			read();
-
-			// PASSS <SP> <mot de passe> <CRLF>
-			write("PASS guest");
-			read();
-
-		} catch (Exception e) {
+			connectLogin(adress, port, user, passwd);
+		} catch (ConnexionException e) {
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 
 	/**
 	 * Connects anon to the ftp server with the adress
+	 * @throws ConnexionException 
+	 * @throws ConnectException 
 	 */
-	public void connectLogin(String adress, int port, String user, String passwd) {
+	public void connectAnon(String adress, int port) throws ConnexionException {
 		try {
 			skt = new Socket(adress, port);
 
@@ -85,16 +71,41 @@ public class FTPClient {
 				System.out.println(reponse);
 			}
 
-			// ER <SP> <nom d'utilisateur> <CRLF>
+			write("USER anonymous");
+			read();
+
+			write("PASS guest");
+			read();
+			//TODO AJOUTER gestion de mauvaise connection avec mauvais login /mdp.
+		} catch (Exception e) {
+			throw new ConnexionException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Connects anon to the ftp server with the adress
+	 * @throws ConnexionException 
+	 */
+	public void connectLogin(String adress, int port, String user, String passwd) throws ConnexionException {
+		try {
+			skt = new Socket(adress, port);
+
+			in = new BufferedReader(new InputStreamReader(skt.getInputStream()));
+			out = new BufferedWriter(new OutputStreamWriter(skt.getOutputStream()));
+
+			String reponse = in.readLine();
+			if (TALK) {
+				System.out.println(reponse);
+			}
+
 			write("USER " + user);
 			read();
 
-			// PASSS <SP> <mot de passe> <CRLF>
 			write("PASS " + passwd);
 			read();
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new ConnexionException(e.getMessage());
 		}
 	}
 
