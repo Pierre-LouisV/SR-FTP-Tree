@@ -36,14 +36,14 @@ public class TreeCommandParser {
 		if(args.length == 0) {
 			throw new WrongArgumentsException();
 		} else if (args.length == 1) {
-			FTPClient ftp = new FTPClient(args[0], 21);
+			FTPTree ftp = new FTPTree(args[0], 21);
 			ftp.tree("/");
 		} else if (args.length > 4) {
 			if (checkArgPassword(args)) { // Connexion with user and password.
 				String user = args[2];
 				String passwd = args[4];
 
-				FTPClient ftp = new FTPClient(args[0], 21, user, passwd);
+				FTPTree ftp = new FTPTree(args[0], 21, user, passwd);
 
 				if (args.length == 7) {
 					if (args[5].equals("-d")) {
@@ -60,13 +60,13 @@ public class TreeCommandParser {
 				}
 			} else if (args.length == 5) {
 				int level = Integer.parseInt(args[4]);
-				FTPClient ftp = new FTPClient(args[0], 21);
+				FTPTree ftp = new FTPTree(args[0], 21);
 				ftp.tree(args[2], level);
 			} else {
 				throw new WrongArgumentsException();
 			}
 		} else if (args.length == 3) {
-			FTPClient ftp = new FTPClient(args[0], 21);
+			FTPTree ftp = new FTPTree(args[0], 21);
 			if (args[1].equals("-d")) {
 				ftp.tree(args[2]);
 			} else if (args[1].equals("-L")) { // On as un Level

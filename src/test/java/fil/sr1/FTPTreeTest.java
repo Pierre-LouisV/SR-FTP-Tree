@@ -19,13 +19,13 @@ import fil.sr1.exception.PasswordException;
  * @author Pierre-Louis Virey
  * 25 janv. 2021
  */
-public class FTPClientTest {
+public class FTPTreeTest {
 	
-	private FTPClient ftp;
+	private FTPTree ftp;
 	
 	@Before
 	public void init() {
-		ftp = new FTPClient();
+		ftp = new FTPTree();
     }
 	
     @Test
