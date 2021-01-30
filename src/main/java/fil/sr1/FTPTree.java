@@ -8,7 +8,6 @@ import java.io.OutputStreamWriter;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import fil.sr1.exception.*;
 
