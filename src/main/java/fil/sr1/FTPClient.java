@@ -23,23 +23,15 @@ public class FTPClient {
 	private BufferedWriter out;
 
 	/**
-	 * Constructor for test
+	 * Blanck constructor, call other method by yourself.
 	 */
-	public FTPClient() {
-
-	}
+	public FTPClient() {}
 
 	/**
 	 * Constructor for anonymous connection
 	 */
 	public FTPClient(String adress, int port) {
-		try {
-			connectAnon(adress, port);
-		} catch (ConnexionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.exit(1);
-		}
+		this(adress, port, "anonymous", "guest");
 	}
 
 	/**
@@ -48,64 +40,51 @@ public class FTPClient {
 	public FTPClient(String adress, int port, String user, String passwd) {
 		try {
 			connectLogin(adress, port, user, passwd);
-		} catch (ConnexionException e) {
+		} catch (ConnexionException | LoginException | PasswordException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
 	}
 
 	/**
-	 * Connects anon to the ftp server with the adress
+	 * Connects anonymously to the ftp server with the adress.
 	 * @throws ConnexionException 
+	 * @throws PasswordException 
+	 * @throws LoginException 
 	 * @throws ConnectException 
 	 */
-	public void connectAnon(String adress, int port) throws ConnexionException {
-		try {
-			skt = new Socket(adress, port);
-
-			in = new BufferedReader(new InputStreamReader(skt.getInputStream()));
-			out = new BufferedWriter(new OutputStreamWriter(skt.getOutputStream()));
-
-			String reponse = in.readLine();
-			if (TALK) {
-				System.out.println(reponse);
-			}
-
-			write("USER anonymous");
-			read();
-
-			write("PASS guest");
-			read();
-			//TODO AJOUTER gestion de mauvaise connection avec mauvais login /mdp.
-		} catch (Exception e) {
-			throw new ConnexionException(e.getMessage());
-		}
+	public void connectAnon(String adress, int port) throws ConnexionException, LoginException, PasswordException {
+		connectLogin(adress, port, "anonymous", "guest");
 	}
 
 	/**
 	 * Connects anon to the ftp server with the adress
 	 * @throws ConnexionException 
+	 * @throws LoginException 
+	 * @throws PasswordException 
 	 */
-	public void connectLogin(String adress, int port, String user, String passwd) throws ConnexionException {
+	public void connectLogin(String adress, int port, String user, String passwd) throws ConnexionException, LoginException, PasswordException {
 		try {
 			skt = new Socket(adress, port);
 
 			in = new BufferedReader(new InputStreamReader(skt.getInputStream()));
 			out = new BufferedWriter(new OutputStreamWriter(skt.getOutputStream()));
-
-			String reponse = in.readLine();
-			if (TALK) {
-				System.out.println(reponse);
-			}
-
-			write("USER " + user);
-			read();
-
-			write("PASS " + passwd);
-			read();
-
 		} catch (Exception e) {
 			throw new ConnexionException(e.getMessage());
+		}
+
+		String reponse = read();
+
+		write("USER " + user);
+		reponse = read();
+		if(!reponse.startsWith("331")) {
+			throw new LoginException(reponse);
+		}
+		
+		write("PASS " + passwd);
+		reponse = read();
+		if(!reponse.startsWith("230")) {
+			throw new PasswordException(reponse);
 		}
 	}
 
@@ -135,7 +114,7 @@ public class FTPClient {
 
 		// LIST [<SP> <chemin d'accès>] <CRLF> Ici on liste le répertoire courant.
 		write("LIST " + directory);
-
+		// Le nouveau socket pour lire les data.
 		Socket sktData = new Socket(ipAdress, port);
 
 		read();
@@ -144,17 +123,13 @@ public class FTPClient {
 
 		String reponse2 = inData.readLine();
 		ArrayList<String> lsResult = new ArrayList<String>();
-
+		
+		//Lecture de toutes les fichiers du dossier.
 		while (reponse2 != null) {
 			lsResult.add(reponse2);
 			reponse2 = inData.readLine();
 		}
-
 		read();
-
-		// Ne change pas grand chose car normalement c'est fermé.
-		// inData.close();
-		// sktData.close();
 
 		return lsResult;
 	}
@@ -166,44 +141,6 @@ public class FTPClient {
 	 */
 	public String[] parseLs(String lsRes) {
 		return null;
-	}
-
-	public void test_co() {
-		String reponse = "";
-
-		try {
-
-			// PWD <CRLF>
-			write("PWD");
-			read();
-
-			ArrayList<String> lsReponse = ls("/");
-			for (String file : lsReponse) {
-				System.out.println(file);
-			}
-
-			// On lis le resultat de la commande ls
-			// read();
-
-			write("PWD");
-			read();
-
-			write("CWD cdimage");
-			read();
-
-			write("PWD");
-			read();
-
-			lsReponse = ls("/cdimage/");
-			for (String file : lsReponse) {
-				System.out.println(file);
-			}
-			// read();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		System.out.println("------");
 	}
 
 	/**
@@ -275,11 +212,9 @@ public class FTPClient {
 	 * @param baseLevel the firstLevel used to print with good tabulation
 	 */
 	protected void tree(String directory, int level, int baseLevel) {
-
 		// Non execution de la fonction si le niveau n'est est de 0.
-		if (level <= 0) {
+		if (level <= 0)
 			return;
-		}
 
 		try {
 			ArrayList<String> lsReponse = ls(directory);
@@ -307,7 +242,6 @@ public class FTPClient {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
