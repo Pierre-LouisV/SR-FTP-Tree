@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import fil.sr1.exception.*;
 
@@ -23,12 +24,12 @@ public class FTPClient {
 	private BufferedWriter out;
 
 	/**
-	 * Blanck constructor, call other method by yourself.
+	 * Blank constructor, to call other method by yourself.
 	 */
 	public FTPClient() {}
 
 	/**
-	 * Constructor for anonymous connection
+	 * Constructor for anonymous connection.
 	 */
 	public FTPClient(String adress, int port) {
 		this(adress, port, "anonymous", "guest");
@@ -41,8 +42,7 @@ public class FTPClient {
 		try {
 			connectLogin(adress, port, user, passwd);
 		} catch (ConnexionException | LoginException | PasswordException e) {
-			e.printStackTrace();
-			System.exit(1);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -93,12 +93,16 @@ public class FTPClient {
 	 * 
 	 * @return the raw result of the command.
 	 * @throws IOException
+	 * @throws PASVException 
 	 */
-	public ArrayList<String> ls(String directory) throws IOException {
+	protected ArrayList<String> ls(String directory) throws IOException, PASVException {
 		// Connection passive
 		write("PASV");
 		String reponse = read();
-
+		if(!reponse.startsWith("227")) {
+			throw new PASVException(reponse);
+		}
+		
 		// On parse la réponse. On as comme format (IP1,IP2,IP3,IP4,PORT1,PORT2).
 		String[] rep = reponse.split("\\(");
 		String[] repSplited = rep[1].split(",");
@@ -112,7 +116,7 @@ public class FTPClient {
 			System.out.println(port);
 		}
 
-		// LIST [<SP> <chemin d'accès>] <CRLF> Ici on liste le répertoire courant.
+		//Liste du dossier directory.
 		write("LIST " + directory);
 		// Le nouveau socket pour lire les data.
 		Socket sktData = new Socket(ipAdress, port);
@@ -135,22 +139,13 @@ public class FTPClient {
 	}
 
 	/**
-	 * Parse the ls command
-	 * 
-	 * @return the array with the name inside.
-	 */
-	public String[] parseLs(String lsRes) {
-		return null;
-	}
-
-	/**
 	 * Return true if the file is a directory.
 	 */
-	public boolean isDirectory(String file) {
+	protected boolean isDirectory(String file) {
 		return file.startsWith("d");
 	}
 
-	public String getFileName(String lsLine) {
+	protected String getFileName(String lsLine) {
 		String[] splited = lsLine.split(" ");
 		return splited[splited.length - 1];
 	}
@@ -239,35 +234,34 @@ public class FTPClient {
 					}
 				}
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException | PASVException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
 	/**
 	 * Writes the string and send it to the server
 	 */
-	public void write(String str) {
+	protected void write(String str) {
 		try {
 			out.write(str + "\r\n");
 			out.flush();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
 	/**
 	 * Read the string and send it to the server
 	 */
-	public String read() {
+	protected String read() {
 		String reponse = "pb_read";
 		try {
 			reponse = in.readLine();
 			if (TALK)
 				System.out.println(reponse);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		return reponse;
 	}

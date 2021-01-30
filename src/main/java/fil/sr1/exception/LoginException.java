@@ -10,6 +10,6 @@ package fil.sr1.exception;
  */
 public class LoginException extends Exception {
 	public LoginException(String msg) {
-		super("Failed to send to the user to FTP server. Server reply :\n" + msg);
+		super("Failed to send to the user to FTP server. Server reply : " + msg);
 	}
 }

@@ -11,6 +11,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import fil.sr1.exception.ConnexionException;
+import fil.sr1.exception.LoginException;
+import fil.sr1.exception.PasswordException;
+
 /**
  * @author Pierre-Louis Virey
  * 25 janv. 2021
@@ -42,5 +46,11 @@ public class FTPClientTest {
     public void testIsDirectoryReturnFalseWhenFile() {
     	String directory = "-rw-r--r-- 1 pl pl  131 janv. 26 13:03 README.md"; //example of file we can expect.
     	assertFalse(ftp.isDirectory(directory));
+    }
+    
+    @Test(expected=PasswordException.class)
+    public void testLoginShouldFailWhenGivenWrongPassword() throws ConnexionException, LoginException, PasswordException {
+    	//Test stupide car on ne fais pas un mock du serveur et il peux s'agit d'un faute du serveur néenmoins je souhatais tester une exception.
+    	ftp.connectLogin("vps-e0d81721.vps.ovh.net", 21, "bizarre", null);
     }
 }

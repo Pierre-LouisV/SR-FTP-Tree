@@ -1,5 +1,7 @@
 package fil.sr1;
 
+import fil.sr1.exception.WrongArgumentsException;
+
 /**
  * @author Pierre-Louis Virey
  * 19 janv. 2021
@@ -24,9 +26,13 @@ public class Main {
 		//String[] fakeArg = {"vps-e0d81721.vps.ovh.net","-u","plv","-p","jaimelesgrosftp","-d","dir2","-L","1"};
 		//String[] fakeArg = {"vps-e0d81721.vps.ovh.net","-u","plv","-p","jaimelesgrosftp","-L","10"};
 		//String[] fakeArg = {"ftp.ubuntu.com","-L","1"};
-		String[] fakeArg = {"ftp.ubuntu.com","-d","cdimage"};
+		String[] fakeArg = {"ftp.ubuntu.com","-d","a"};
 		
 		TreeCommandParser tcp = new TreeCommandParser(fakeArg);
-		tcp.parseLaunchTree();
+		try {
+			tcp.parseLaunchTree();
+		} catch (WrongArgumentsException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

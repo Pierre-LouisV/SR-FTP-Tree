@@ -4,6 +4,8 @@
  */
 package fil.sr1;
 
+import fil.sr1.exception.WrongArgumentsException;
+
 /**
  * @author Pierre-Louis Virey
  * 30 janv. 2021
@@ -20,27 +22,19 @@ public class TreeCommandParser {
 	}
 	
 	/**
-	 * Display the error message about the arguments.
-	 */
-	private void incorrectUsage() {
-		System.out.println("Incorrect options please refer to the following pattern :\n"
-							+"java -jar TreeFtp.jar server_adress [[-u user] [-p password]] [-d directory] [-L level]");
-		System.exit(1);
-	}
-	
-	/**
 	 * Return true if the argument contains a password.
 	 */
-	private boolean checkArgPassword(String[] args) {
+	protected boolean checkArgPassword(String[] args) {
 		return args[1].equals("-u") && args[3].equals("-p");
 	}
 	
 	/**
 	 * Choose the right way to tree depending on the options.
+	 * @throws WrongArgumentsException 
 	 */
-	public void parseLaunchTree() {
+	public void parseLaunchTree() throws WrongArgumentsException {
 		if(args.length == 0) {
-			incorrectUsage();
+			throw new WrongArgumentsException();
 		} else if (args.length == 1) {
 			FTPClient ftp = new FTPClient(args[0], 21);
 			ftp.tree("/");
@@ -69,7 +63,7 @@ public class TreeCommandParser {
 				FTPClient ftp = new FTPClient(args[0], 21);
 				ftp.tree(args[2], level);
 			} else {
-				incorrectUsage();
+				throw new WrongArgumentsException();
 			}
 		} else if (args.length == 3) {
 			FTPClient ftp = new FTPClient(args[0], 21);
@@ -79,10 +73,10 @@ public class TreeCommandParser {
 				int level = Integer.parseInt(args[2]);
 				ftp.tree(level);
 			} else {
-				incorrectUsage();
+				throw new WrongArgumentsException();
 			}
 		} else {
-			incorrectUsage();
+			throw new WrongArgumentsException();
 		}
 	}
 }
