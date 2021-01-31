@@ -64,23 +64,23 @@ public class FTPTree implements FTPClient {
 	 */
 	public void connectLogin(String adress, int port, String user, String passwd) throws ConnexionException, LoginException, PasswordException {
 		try {
-			skt = new Socket(adress, port);
+			skt = new Socket(adress, port);		//Connection au socket du serveur.
 
-			in = new BufferedReader(new InputStreamReader(skt.getInputStream()));
-			out = new BufferedWriter(new OutputStreamWriter(skt.getOutputStream()));
+			in = new BufferedReader(new InputStreamReader(skt.getInputStream()));		//Création du flux d'entrée.
+			out = new BufferedWriter(new OutputStreamWriter(skt.getOutputStream()));	//Creation du flux de sortie.
 		} catch (Exception e) {
 			throw new ConnexionException(e.getMessage());
 		}
 
 		String reponse = read();
 
-		write("USER " + user);
+		write("USER " + user);		//Renseignement du nom d'utilisateur : user
 		reponse = read();
 		if(!reponse.startsWith("331")) {
 			throw new LoginException(reponse);
 		}
 		
-		write("PASS " + passwd);
+		write("PASS " + passwd);	//Renseignement du mot de passe.
 		reponse = read();
 		if(!reponse.startsWith("230")) {
 			throw new PasswordException(reponse);
@@ -95,7 +95,7 @@ public class FTPTree implements FTPClient {
 	 * @throws PASVException 
 	 */
 	protected ArrayList<String> ls(String directory) throws IOException, PASVException {
-		// Connection passive
+		// Connection en mode passif
 		write("PASV");
 		String reponse = read();
 		if(!reponse.startsWith("227")) {
@@ -109,7 +109,7 @@ public class FTPTree implements FTPClient {
 		if (TALK) {
 			System.out.println(ipAdress);
 		}
-
+		// Calcul du port à utiliser pour la connection.
 		int port = Integer.parseInt(repSplited[4]) * 256 + Integer.parseInt(repSplited[5].replace(")", ""));
 		if (TALK) {
 			System.out.println(port);
@@ -119,9 +119,10 @@ public class FTPTree implements FTPClient {
 		write("LIST " + directory);
 		// Le nouveau socket pour lire les data.
 		Socket sktData = new Socket(ipAdress, port);
-
+		//Lecture de la réponse du serveur.
 		read();
-
+		
+		//Création du socket permettant la connection.
 		BufferedReader inData = new BufferedReader(new InputStreamReader(sktData.getInputStream()));
 
 		String reponse2 = inData.readLine();
@@ -211,26 +212,19 @@ public class FTPTree implements FTPClient {
 			return;
 
 		try {
-			ArrayList<String> lsReponse = ls(directory);
+			ArrayList<String> lsReponse = ls(directory);	//Récupération de la commande ls sur le repo.
+			String tab = getTab(level, baseLevel);			//Niveau d'indentation dans la console.
 			for (int i = 0; i < lsReponse.size(); i++) {
 				String file = lsReponse.get(i);
 				String fileName = getFileName(file);
-
-				String tab = getTab(level, baseLevel);
-
-				if (isDirectory(file)) {
-					if (i != lsReponse.size() - 1) {
-						System.out.println(tab + "├──" + fileName);
-					} else {
-						System.out.println(tab + "└──" + fileName);
-					}
-					tree(directory + "/" + fileName, level - 1, baseLevel);
+				
+				if (i != lsReponse.size() - 1) {	//Choix de l'affichage pour l'estétique.
+					System.out.println(tab + "├──" + fileName);
 				} else {
-					if (i != lsReponse.size() - 1) {
-						System.out.println(tab + "├──" + fileName);
-					} else {
-						System.out.println(tab + "└──" + fileName);
-					}
+					System.out.println(tab + "└──" + fileName);
+				}
+				if (isDirectory(file)) {	//Execution de la commande sur le noeud s'il s'agit d'un dossier.
+					tree(directory + "/" + fileName, level - 1, baseLevel);
 				}
 			}
 		} catch (IOException | PASVException e) {
