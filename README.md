@@ -147,7 +147,7 @@ protected ArrayList<String> ls(String directory) throws IOException, PASVExcepti
 
 Le code suivant permet de se connecter au serveur précisé par l'adress passée en argument.
 
-```
+``` JAVA
 public void connectLogin(String adress, int port, String user, String passwd) throws ConnexionException, LoginException, PasswordException {
     try {
         skt = new Socket(adress, port);		//Connection au socket du serveur.
@@ -177,7 +177,7 @@ public void connectLogin(String adress, int port, String user, String passwd) th
 
 Le programme propose un système de dialogue pour débuggé de type ON / OFF. Il suffit de passer la variable TALK à true pour obtenir toutes les informations données par le serveur.
 
-```
+``` JAVA
 public static final boolean TALK = false;			//Display the server messages if true
 
 protected String read() {
@@ -198,7 +198,7 @@ protected String read() {
 Le code ci-dessous permet de lancer la commande tree avec les bons arguments. Cependant son implémentation est très cahotique car s'il l'on souhaité ajouter de nouveaux arguments est à ré-écrire.  
 Je sors du contexte du README pour me justifier, j'avais envie d'ajouter un système de niveau et de cible de dossier. La solution la plus rapide pour parser les arguments est ce bout de code affreux. Sachant que c'est du bonus je me suis permis de faire cela.   
 
-```
+``` JAVA
 public void parseLaunchTree() throws WrongArgumentsException {
     if(args.length == 0) {
         ...
