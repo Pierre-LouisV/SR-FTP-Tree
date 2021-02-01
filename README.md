@@ -15,12 +15,15 @@ L'implémentation de ce programme utilise simplement la librairie standard JAVA 
 4. Créer un executable : `mvn package`  
 5. Pour lancer le programme plusieurs options sont dispoible qui suivent la syntaxe suivante :  
 `java -jar TreeFtp.jar server_adress [[-u user] [-p password]] [-d directory] [-L level]`  
+User et paddword sont à renseigner que si on l'on fait une connecion qui necessite une authentification.  
 
-/!\ Les arguments doivent ABSOLUMENT respecter l'ordre présent dans la commande /!\
+/!\ Les arguments doivent ABSOLUMENT respecter l'ordre présent dans la commande /!\  
 
 Exemple de commandes valide :  
 `java -jar target/TreeFTP-1.0.jar ftp.ubuntu.com -L 2`  
 `java -jar target/TreeFTP-1.0.jar ftp.ubuntu.com -d cdimage -L 2`  
+`java -jar target/TreeFTP-1.0.jar your.serv.com -u name -p passwd`  
+`java -jar target/TreeFTP-1.0.jar your.serv.com -u name -p passwd -d yourFile`  
 
 Exemple de commandes invalide :
 `java -jar target/TreeFTP-1.0.jar cool.serv.com -L 2 -d cdimage` car inversion de -L et -d.  
@@ -103,7 +106,7 @@ protected void tree(String directory, int level, int baseLevel) {
 
 ### Execution de LIST sur le serveur FTP
 
-Ci-dessous le code permettant d'obetenir le resultat de la commande ls -al sur le serveur FTP.
+Ci-dessous le code permettant d'obetenir le resultat de la commande ls -al sur le serveur FTP. La fonction renvoie un ArrayList contenant pour chaque element une ligne de la réponse de la commande ls.
 
 ``` JAVA
 protected ArrayList<String> ls(String directory) throws IOException, PASVException {
@@ -145,7 +148,7 @@ protected ArrayList<String> ls(String directory) throws IOException, PASVExcepti
 
 ### Connection au serveur
 
-Le code suivant permet de se connecter au serveur précisé par l'adress passée en argument.
+Le code suivant permet de se connecter au serveur précisé par l'adresse passée en argument. La fonction gère les problèmes de connexion grâce à ses exceptions.  
 
 ``` JAVA
 public void connectLogin(String adress, int port, String user, String passwd) throws ConnexionException, LoginException, PasswordException {
@@ -175,7 +178,7 @@ public void connectLogin(String adress, int port, String user, String passwd) th
 ```
 ### Système de dialogue
 
-Le programme propose un système de dialogue pour débuggé de type ON / OFF. Il suffit de passer la variable TALK à true pour obtenir toutes les informations données par le serveur.
+Le programme propose un système de dialogue pour débuggé de type ON / OFF. Il suffit de passer la variable TALK à true pour obtenir toutes les informations données par le serveur dans la sortie standard. La fonction retourne dans tous les cas la réponse lu.  
 
 ``` JAVA
 public static final boolean TALK = false;			//Display the server messages if true

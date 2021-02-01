@@ -5,6 +5,8 @@
 package fil.sr1.exception;
 
 /**
+ * @author Pierre-Louis Virey
+ * 28 janv. 2021
  * Is raised when you couldn't connect to the server.
  */
 public class ConnexionException extends Exception { // ou RuntimeException

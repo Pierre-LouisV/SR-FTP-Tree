@@ -144,7 +144,10 @@ public class FTPTree implements FTPClient {
 	protected boolean isDirectory(String file) {
 		return file.startsWith("d");
 	}
-
+	
+	/**
+	 * Return the file name from an lsLine.
+	 */
 	protected String getFileName(String lsLine) {
 		String[] splited = lsLine.split(" ");
 		return splited[splited.length - 1];
