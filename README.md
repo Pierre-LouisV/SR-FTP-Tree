@@ -4,69 +4,69 @@ Pierre-Louis Virey
 
 # Introduction
 
-Cette petite application permet de realiser la commande Tree sur un serveur FTP à partir d'une ligne de commande.  
-L'implémentation de ce programme utilise simplement la librairie standard JAVA et ce compile avec l'outil Apache Maven.  
+Cette petite application permet de réaliser la commande Tree sur un serveur FTP à partir d'une ligne de commande.  
+L'implémentation de ce programme utilise simplement la librairie standard JAVA et se compile avec l'outil Apache Maven.  
 
 # Usage et installation
 
-1. La compaliation de ce programme est faite avec l'outil Apache maven pour l'obtenir : `apt install maven`
+1. La compilation de ce programme est faite avec l'outil Apache maven pour l'obtenir : `apt install maven`
 2. Cloner le repository : `git clone https://github.com/Pierre-LouisV/SR-FTP-Tree.git`  
-3. Déplacer vous dans le repertoire : `cd SR-FTP-Tree`  
-4. Créer un executable : `mvn package`  
-5. Pour lancer le programme plusieurs options sont dispoible qui suivent la syntaxe suivante :  
+3. Déplacer vous dans le répertoire : `cd SR-FTP-Tree`  
+4. Créer un exécutable : `mvn package`  
+5. Pour lancer le programme plusieurs options sont disponibles qui suivent la syntaxe suivante :  
 `java -jar TreeFtp.jar server_adress [[-u user] [-p password]] [-d directory] [-L level]`  
-User et paddword sont à renseigner que si on l'on fait une connecion qui necessite une authentification.  
+User et password ne sont à renseigner que si l'on fait une connexion qui nécessite une authentification.  
 
 /!\ Les arguments doivent ABSOLUMENT respecter l'ordre présent dans la commande /!\  
 
-Exemple de commandes valide :  
+Exemple de commandes valides :  
 `java -jar target/TreeFTP-1.0.jar ftp.ubuntu.com -L 2`  
 `java -jar target/TreeFTP-1.0.jar ftp.ubuntu.com -d cdimage -L 2`  
 `java -jar target/TreeFTP-1.0.jar your.serv.com -u name -p passwd`  
 `java -jar target/TreeFTP-1.0.jar your.serv.com -u name -p passwd -d yourFile`  
 
-Exemple de commandes invalide :
+Exemple de commandes invalides :
 `java -jar target/TreeFTP-1.0.jar cool.serv.com -L 2 -d cdimage` car inversion de -L et -d.  
 `java -jar target/TreeFTP-1.0.jar cool.serv.com -u rate` car pas de -p pour ajouter le password.  
 
 # Architecture
 
-L'architecutre de ce programme est simple. Voici un diagramme de classe de l'application :
+L'architecture de ce programme est simple. Voici un diagramme de classe de l'application :
 
 ![](doc/diag-uml-main.png)
 
-Le code dans la classe Main permet simplement de creer un objet TreeCommandParser qui lance la commande tree avec les bonnes options.  
+Le code dans la classe Main permet simplement de créer un objet TreeCommandParser qui lance la commande tree avec les bonnes options.  
 
-On as une interface FTPClient qui représente un moyen d'avoir un client FTP.  
+On a une interface FTPClient qui représente un moyen d'avoir un client FTP.  
 
-La classe FTPTree est le coeur de l'application, elle implémente la classe FTPClient car elle est un client d'un serveur FTP. Le code contenu dans cette classe permet de faire la commande tree sur le serveur FTP choisis par l'utilisateur.  
+La classe FTPTree est le coeur de l'application, elle implémente la classe FTPClient car elle est un client d'un serveur FTP. Le code contenu dans cette classe permet de faire la commande tree sur le serveur FTP choisi par l'utilisateur.  
 
 ### Méthode polymorphes :
-- Le constructeur FTPTree : Il as un constructeur vide pour pouvoir se connecter sois même grâce aux fonctions connect(). Le constructeur FTPTree(String adress, int port) appele lui le constructeur FTPTree(String adress, int port, String user, String passwd) avec en user et passwd les indentifiants pour une connection anonyme.
+- Le constructeur FTPTree : Il y a un constructeur vide pour pouvoir se connecter soit même grâce aux fonctions connect(). Le constructeur FTPTree(String adress, int port) appele lui le constructeur FTPTree(String adress, int port, String user, String passwd) avec en user et passwd, les indentifiants pour une connexion anonyme.
 - La méthode tree : Ici on retrouve 5 méthodes tree avec un signature différente. Cela permet de filtrer les arguments pour lancer au final la méthode contenant le code du tree : tree(String directory, int level, int baseLevel). 
 
 ### Gestion des erreurs: 
 
-Afin de gérer des erreurs qui peuvent arriver facilement avec une communication réseaux, plusieurs exceptions on été crées :
+Afin de gérer des erreurs qui peuvent arriver facilement avec une communication réseau, plusieurs exceptions ont été crées :
 
 ![](doc/diag-uml-exception.png)
 
 Voici pour chacune pourquoi elles sont levées :
 
 - ConnexionException : Connexion impossible au serveur.
-- LoginException : Le login n'est pas accpeté par le serveur.
-- PasswordException : Le password n'est pas accpeté par le serveur.
-- PASVException : La connexion passive as échouée.
-- WrongArgumentsException : Les arguments passée en ligne de commandes ne respenctent pas la bonne syntaxe.
+- LoginException : Le login n'est pas accepté par le serveur.
+- PasswordException : Le password n'est pas accepté par le serveur.
+- PASVException : La connexion passive a échoué.
+- WrongArgumentsException : Les arguments passé en ligne de commandes ne respectent pas la bonne syntaxe.
 
-Dans le programme toutes les catch d'execptions entraine un arret de l'execution par une runtimeException.  
+Dans le programme toutes les catch d'execptions entrainent un arrêt de l'exécution par une runtimeException.  
 
 **Main**
 - Catch de d'une WrongArgumentsException.  
 **TreeCommandParser**
 - Throw de WrongArgumentsException dans la méthode parseLaunchTree().
 **FTPTree**
-- Le constructeur ftp tree catch sois une ConnexionException ou LoginException ou PasswordException. La detection entraine l'arret du programme par une runtimeException.
+- Le constructeur ftp tree catch soit une ConnexionException ou LoginException ou PasswordException. La détection entraine l'arrêt du programme par une runtimeException.
 - La méthode ls() throw une PASVException.
 - La méthode tree() catch des IOException ou PASVException.
 - Les méthodes read() et write() catch des IOException.
@@ -106,7 +106,7 @@ protected void tree(String directory, int level, int baseLevel) {
 
 ### Execution de LIST sur le serveur FTP
 
-Ci-dessous le code permettant d'obetenir le resultat de la commande ls -al sur le serveur FTP. La fonction renvoie un ArrayList contenant pour chaque element une ligne de la réponse de la commande ls.
+Ci-dessous le code permettant d'obtenir le résultat de la commande ls -al sur le serveur FTP. La fonction renvoie un ArrayList contenant pour chaque élément une ligne de la réponse de la commande ls.
 
 ``` JAVA
 protected ArrayList<String> ls(String directory) throws IOException, PASVException {
@@ -117,7 +117,7 @@ protected ArrayList<String> ls(String directory) throws IOException, PASVExcepti
         throw new PASVException(reponse);
     }
     
-    // On parse la réponse. On as comme format (IP1,IP2,IP3,IP4,PORT1,PORT2).
+    // On parse la réponse. On a comme format (IP1,IP2,IP3,IP4,PORT1,PORT2).
     ...
     // Calcul du port à utiliser pour la connection.
     ...
@@ -129,7 +129,7 @@ protected ArrayList<String> ls(String directory) throws IOException, PASVExcepti
     //Lecture de la réponse du serveur.
     read();
     
-    //Création du socket permettant la connection.
+    //Création du socket permettant la connexion.
     BufferedReader inData = new BufferedReader(new InputStreamReader(sktData.getInputStream()));
 
     String reponse2 = inData.readLine();
@@ -146,7 +146,7 @@ protected ArrayList<String> ls(String directory) throws IOException, PASVExcepti
 }
 ```
 
-### Connection au serveur
+### Connexion au serveur
 
 Le code suivant permet de se connecter au serveur précisé par l'adresse passée en argument. La fonction gère les problèmes de connexion grâce à ses exceptions.  
 
@@ -196,7 +196,7 @@ protected String read() {
 }
 ```
 
-### Mauvaise exemple de lecture de ligne de commande.
+### Mauvais exemple de lecture de ligne de commande.
 
 Le code ci-dessous permet de lancer la commande tree avec les bons arguments. Cependant son implémentation est très cahotique car s'il l'on souhaité ajouter de nouveaux arguments est à ré-écrire.  
 Je sors du contexte du README pour me justifier, j'avais envie d'ajouter un système de niveau et de cible de dossier. La solution la plus rapide pour parser les arguments est ce bout de code affreux. Sachant que c'est du bonus je me suis permis de faire cela.   
@@ -208,7 +208,7 @@ public void parseLaunchTree() throws WrongArgumentsException {
     } else if (args.length == 1) {
         ...
     } else if (args.length > 4) {
-        if (checkArgPassword(args)) { // Connexion with user and password.
+        if (checkArgPassword(args)) { // Connection with user and password.
             ...
             if (args.length == 7) {
                 if (args[5].equals("-d")) {
