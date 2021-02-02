@@ -98,7 +98,8 @@ public class FTPTree implements FTPClient {
 		// Connection en mode passif
 		write("PASV");
 		String reponse = read();
-		if(!reponse.startsWith("227")) {
+
+		if(reponse == null || !reponse.startsWith("227")) {		//Si la reponse est null, il y as un problème à cause du dossier précèdent. 
 			throw new PASVException(reponse);
 		}
 		

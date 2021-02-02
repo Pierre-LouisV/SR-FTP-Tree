@@ -106,16 +106,16 @@ protected void tree(String directory, int level, int baseLevel) {
 
 ### Execution de LIST sur le serveur FTP
 
-Ci-dessous le code permettant d'obtenir le résultat de la commande ls -al sur le serveur FTP. La fonction renvoie un ArrayList contenant pour chaque élément une ligne de la réponse de la commande ls.
-
+Ci-dessous le code permettant d'obtenir le résultat de la commande ls -al sur le serveur FTP. La fonction renvoie un ArrayList contenant pour chaque élément une ligne de la réponse de la commande ls.  
 ``` JAVA
 protected ArrayList<String> ls(String directory) throws IOException, PASVException {
     // Connection en mode passif
     write("PASV");
     String reponse = read();
-    if(!reponse.startsWith("227")) {
-        throw new PASVException(reponse);
-    }
+    
+    if(reponse == null || !reponse.startsWith("227")) {		//Si la reponse est null, il y as un problème à cause du dossier précèdent. 
+			throw new PASVException(reponse);
+	}
     
     // On parse la réponse. On a comme format (IP1,IP2,IP3,IP4,PORT1,PORT2).
     ...

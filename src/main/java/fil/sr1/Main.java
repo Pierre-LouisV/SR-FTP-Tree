@@ -11,7 +11,7 @@ public class Main {
 	/**
 	 * Main class that uses the tree command parser to launch the tree command. 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) {		
 		TreeCommandParser tcp = new TreeCommandParser(args);
 		try {
 			tcp.parseLaunchTree();
