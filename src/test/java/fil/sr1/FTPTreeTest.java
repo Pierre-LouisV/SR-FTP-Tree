@@ -48,9 +48,9 @@ public class FTPTreeTest {
     	assertFalse(ftp.isDirectory(directory));
     }
     
-    @Test(expected=PasswordException.class)
-    public void testLoginShouldFailWhenGivenWrongPassword() throws ConnexionException, LoginException, PasswordException {
+    @Test(expected=LoginException.class)
+    public void testLoginShouldFailWhenGivenPassword() throws ConnexionException, LoginException, PasswordException {
     	//Test stupide car on ne fais pas un mock du serveur et il peux s'agit d'un faute du serveur néenmoins je souhatais tester une exception.
-    	ftp.connectLogin("vps-e0d81721.vps.ovh.net", 21, "bizarre", null);
+    	ftp.connectLogin("ftp.ubuntu.com", 21, "bizarre", null);
     }
 }
