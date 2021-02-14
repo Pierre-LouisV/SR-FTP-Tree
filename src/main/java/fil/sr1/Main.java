@@ -11,8 +11,11 @@ public class Main {
 	/**
 	 * Main class that uses the tree command parser to launch the tree command. 
 	 */
-	public static void main(String[] args) {		
-		TreeCommandParser tcp = new TreeCommandParser(args);
+	public static void main(String[] args) {
+		
+		String[] fakeArgs = {"ftp.ubuntu.com","-L","1"};
+		
+		TreeCommandParser tcp = new TreeCommandParser(fakeArgs);
 		try {
 			tcp.parseLaunchTree();
 		} catch (WrongArgumentsException e) {

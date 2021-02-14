@@ -16,7 +16,7 @@ import fil.sr1.exception.*;
  */
 public class FTPTree implements FTPClient {
 
-	public static final boolean TALK = false;			//Display the server messages if true
+	public static final boolean TALK = true;			//Display the server messages if true
 	public static final int MAX_SUB_DIRECTORY = 6400;	//The max number of sub-directory to list
 	private Socket skt;
 	private BufferedReader in;
